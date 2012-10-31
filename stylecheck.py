@@ -76,7 +76,7 @@ def findProblemSequences(wholeFile, line, file, lineNumber, totalLines):
         return problems, line
 
     if lineNumber == 1 and ( \
-        (line.startswith(" ") and not os.path.basename(file) == "COPYING") or \
+        (line.startswith(" ") and not os.path.basename(file) == "LICENSE") or \
         (line.startswith("\t") and not os.path.basename(file) == ".gitignore") or \
         line.startswith("\n")):
         if args.autofix:
