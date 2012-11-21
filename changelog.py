@@ -28,107 +28,102 @@ class Version:
             self.date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
         self.items = []
 
+    ''' Returns the release date in a format appropriate for a Debian changelog '''
     def debianDate(self):
         if self.date == "Unreleased":
             return self.date
         else:
             return self.date.strftime('%a, %b %d %Y %H:%M:%S %z').strip()
 
+    ''' Returns the release date in a format appropriate for an RPM changelog'''
     def rpmDate(self):
         if self.date == "Unreleased":
             return self.date
         else:
             return self.date.strftime('%a %b %d %Y')
 
+    ''' Returns the release date (and time) in ISO 8601 format '''
     def isoDate(self):
         if self.date == "Unreleased":
             return self.date
         else:
             return self.date.isoformat()
 
+    ''' Converts the Version structure to a dictionary '''
     def toDict(self):
         return dict(number=self.number, date=self.isoDate(), items=self.items)
 
+''' A JSON encoder that writes Version structures '''
 class VersionEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Version):
             return obj.toDict()
         return json.JSONEncoder.default(self, obj)
 
-parser = argparse.ArgumentParser(description="Converts our changelog format to various alternate formats.")
-parser.add_argument("--debian", action="store", help="Filename to write Debian changelog to")
-parser.add_argument("--rpm", action="store", help="Filename to write RPM changelog to")
-parser.add_argument("--json", action="store", help="Filename to write JSON changelog to")
-parser.add_argument("package", help="Name of the package being built")
-parser.add_argument("changelog", help="Filename of our changelog in markdown format")
+parser = argparse.ArgumentParser(description="Converts markdown changelogs to various alternate formats.")
+parser.add_argument("--debian", type=argparse.FileType('w'), help="path to write Debian changelog to, or - for <stdout>")
+parser.add_argument("--rpm", type=argparse.FileType('w'), help="path to write RPM changelog to, or - for <stdout>")
+parser.add_argument("--json", type=argparse.FileType('w'), help="path to write JSON changelog to, or - for <stdout>")
+parser.add_argument("package", help="name of the package being built")
+parser.add_argument("changelog", type=argparse.FileType('r'), help="path to a changelog in markdown format or - for <stdin>")
 
 args = parser.parse_args()
 
-inputPath = os.path.realpath(args.changelog)
+if args.changelog == sys.stdin:
+    print("Enter the changelog contents in markdown format and press CTRL+D when done:", file=sys.stderr)
 
 # List of versions with their number, release date, and change items
 versions = []
 
-if os.path.isfile(inputPath):
-    with open(inputPath, "r+") as f:
-        lines = f.readlines()
+# Read input from markdown file
+lines = args.changelog.readlines()
+for line in lines:
+    # Strip the last \n on the line
+    line = line[:-1]
 
-        for line in lines:
-            # Strip the last \n
-            line = line[:-1]
-
-            match = re.match("^### Version (?P<version_number>[0-9]+\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?) - (?P<release_date>([0-9]{4}-[0-9]{2}-[0-9]{2})|Unreleased)$", line)
-            if match:
-                # New version section
-                versions.append(Version(match.group("version_number"), match.group("release_date")))
-            elif line.startswith("* "):
-                # Add new change item
-                versions[-1].items.append(line[2:])
-            elif line.startswith("  "):
-                # Continuation of last change item, append it
-                versions[-1].items[-1] += (line[1:])
-else:
-    print(args.changelog + " not found")
-    sys.exit(1)
+    match = re.match("^### Version (?P<version_number>[0-9]+\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?) - (?P<release_date>([0-9]{4}-[0-9]{2}-[0-9]{2})|Unreleased)$", line)
+    if match:
+        # New version section
+        versions.append(Version(match.group("version_number"), match.group("release_date")))
+    elif line.startswith("* "):
+        # Add new change item
+        versions[-1].items.append(line[2:])
+    elif line.startswith("  "):
+        # Continuation of last change item, append it
+        versions[-1].items[-1] += (line[1:])
 
 if args.debian:
-    debianPath = os.path.realpath(args.debian)
+    for version in versions:
+        print("%s (%s) unstable; urgency=low\n" % (args.package, version.number), file=args.debian)
 
-    with open(debianPath, "w+") as f:
-        for version in versions:
-            print("%s (%s) unstable; urgency=low\n" % (args.package, version.number), file=f)
+        for item in version.items:
+            print("  * %s\n" % item, file=args.debian)
 
-            for item in version.items:
-                print("  * %s\n" % item, file=f)
+        print(" -- AXR Project <team@axr.vg>  %s" % version.debianDate(), file=args.debian) # Yes, TWO spaces
 
-            print(" -- AXR Project <team@axr.vg>  %s" % version.debianDate(), file=f) # Yes, TWO spaces
+        # Newline if this isn't the last version (else it ends with two)
+        if version != versions[-1]:
+            print(file=args.debian)
 
-            # Newline if this isn't the last version (else it ends with two)
-            if version != versions[-1]:
-                print(file=f)
-
-    print("Wrote Debian changelog to " + debianPath)
+    if args.debian != sys.stdout:
+        print("Wrote Debian changelog to " + args.debian.name, file=sys.stderr)
 
 if args.rpm:
-    rpmPath = os.path.realpath(args.rpm)
+    for version in versions:
+        print("* %s AXR Project <team@axr.vg> %s" % (version.rpmDate(), version.number), file=args.rpm)
 
-    with open(rpmPath, "w+") as f:
-        for version in versions:
-            print("* %s AXR Project <team@axr.vg> %s" % (version.rpmDate(), version.number), file=f)
+        for item in version.items:
+            print("- %s" % item, file=args.rpm)
 
-            for item in version.items:
-                print("- %s" % item, file=f)
+        # Newline if this isn't the last version (else it ends with two)
+        if version != versions[-1]:
+            print(file=args.rpm)
 
-            # Newline if this isn't the last version (else it ends with two)
-            if version != versions[-1]:
-                print(file=f)
-
-    print("Wrote RPM changelog to " + rpmPath)
+    if args.rpm != sys.stdout:
+        print("Wrote RPM changelog to " + args.rpm.name, file=sys.stderr)
 
 if args.json:
-    jsonPath = os.path.realpath(args.json)
+    print(json.dumps(dict(package=args.package, changelog=versions), sort_keys=False, indent=4, cls=VersionEncoder), file=args.json)
 
-    with open(jsonPath, "w+") as f:
-        print(json.dumps(dict(package=args.package, changelog=versions), sort_keys=False, indent=4, cls=VersionEncoder), file=f)
-
-    print("Wrote JSON changelog to " + jsonPath)
+    if args.json != sys.stdout:
+        print("Wrote JSON changelog to " + args.json.name, file=sys.stderr)
