@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
 
-./bin/update-authors.sh
-./bin/stylecheck.py
+./common/update-authors.sh
+./common/stylecheck.py
