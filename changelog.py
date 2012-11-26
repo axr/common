@@ -33,7 +33,10 @@ class Version:
         if self.date == "Unreleased":
             return self.date
         else:
-            return self.date.strftime('%a, %d %b %Y %H:%M:%S %z').strip()
+            # %z gets replaced with an empty string if the object is "naive"
+            # which, in our situation currently always will be... but Debian
+            # always expects this part to be present so we'll hardcode +0000
+            return self.date.strftime('%a, %d %b %Y %H:%M:%S +0000').strip()
 
     ''' Returns the release date in a format appropriate for an RPM changelog'''
     def rpmDate(self):
