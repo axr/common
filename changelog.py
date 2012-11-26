@@ -33,7 +33,7 @@ class Version:
         if self.date == "Unreleased":
             return self.date
         else:
-            return self.date.strftime('%a, %b %d %Y %H:%M:%S %z').strip()
+            return self.date.strftime('%a, %d %b %Y %H:%M:%S %z').strip()
 
     ''' Returns the release date in a format appropriate for an RPM changelog'''
     def rpmDate(self):
