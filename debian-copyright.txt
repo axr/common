@@ -12,7 +12,7 @@ Upstream Author:
 
 Copyright:
 
-    © 2010-2012 AXR Project Contributors.
+    © 2010-2013 AXR Project Contributors.
 
 License:
 
@@ -44,6 +44,6 @@ On Debian systems, the complete text of the GNU Public Licenses can be found in
 
 The Debian packaging is:
 
-    Copyright (C) 2010-2012 AXR Project Contributors <team@axr.vg>
+    Copyright (C) 2010-2013 AXR Project Contributors <team@axr.vg>
 
 and is licensed under the GPL version 3, see above.
