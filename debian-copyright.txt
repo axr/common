@@ -1,10 +1,10 @@
 This work was packaged for Debian by:
 
-    AXR Project Contributors <team@axr.vg> on @DATE_R@.
+    AXR Project Contributors <team@axrproject.org> on @DATE_R@.
 
 It was downloaded from:
 
-    http://axr.vg/downloads
+    http://axrproject.org/downloads
 
 Upstream Author:
 
@@ -44,6 +44,6 @@ On Debian systems, the complete text of the GNU Public Licenses can be found in
 
 The Debian packaging is:
 
-    Copyright (C) 2010-2013 AXR Project Contributors <team@axr.vg>
+    Copyright (C) 2010-2013 AXR Project Contributors <team@axrproject.org>
 
 and is licensed under the GPL version 3, see above.

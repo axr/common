@@ -102,7 +102,7 @@ if args.debian:
         for item in version.items:
             print("  * %s\n" % item, file=args.debian)
 
-        print(" -- AXR Project <team@axr.vg>  %s" % version.debianDate(), file=args.debian) # Yes, TWO spaces
+        print(" -- AXR Project <team@axrproject.org>  %s" % version.debianDate(), file=args.debian) # Yes, TWO spaces
 
         # Newline if this isn't the last version (else it ends with two)
         if version != versions[-1]:
@@ -113,7 +113,7 @@ if args.debian:
 
 if args.rpm:
     for version in versions:
-        print("* %s AXR Project <team@axr.vg> %s" % (version.rpmDate(), version.number), file=args.rpm)
+        print("* %s AXR Project <team@axrproject.org> %s" % (version.rpmDate(), version.number), file=args.rpm)
 
         for item in version.items:
             print("- %s" % item, file=args.rpm)
