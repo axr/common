@@ -33,12 +33,17 @@ module AXRValidator
       end
 
       def validate_encoding_utf8
-        if String.respond_to? 'encoding'
+        if String.instance_methods(false).include?(:encoding)
           unless @data.encoding == ::Encoding::UTF_8
             error = Error.new(self.class, "Non-UTF-8 encoding detected: '#{@data.encoding.name}'")
             error.location(@file, nil)
             error.attach_to(@validator)
           end
+        elsif not defined? @@warned_old_ruby
+          warning = Warning.new(self.class, "Insufficient Ruby version (Ruby >= 1.9 required). Skipping encoding verification step")
+          warning.attach_to(@validator)
+
+          @@warned_old_ruby = true
         end
 
         if @data[0, 3] == "\xEF\xBB\xBF"
