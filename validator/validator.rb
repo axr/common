@@ -1,14 +1,16 @@
-require_relative "file_scanner.rb"
-require_relative "git_file.rb"
+dir = File.expand_path File.dirname(__FILE__)
 
-require_relative "message.rb"
-require_relative "warning.rb"
-require_relative "error.rb"
+require "#{dir}/file_scanner.rb"
+require "#{dir}/git_file.rb"
 
-require_relative "validators/base.rb"
-require_relative "validators/generic.rb"
-require_relative "validators/json.rb"
-require_relative "validators/markdown.rb"
+require "#{dir}/message.rb"
+require "#{dir}/warning.rb"
+require "#{dir}/error.rb"
+
+require "#{dir}/validators/base.rb"
+require "#{dir}/validators/generic.rb"
+require "#{dir}/validators/json.rb"
+require "#{dir}/validators/markdown.rb"
 
 module AXRValidator
   class Validator
