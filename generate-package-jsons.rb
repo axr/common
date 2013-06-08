@@ -35,7 +35,7 @@ unless input_dir.nil?
       regex = /^(?<package>[a-z0-9-]+)-(?<version>[0-9.]+)(-(?<os>linux))?-(?<arch>i386|x86_64|src)\.(?<type>tar\.gz|zip)$/
 
     when ".dmg"
-      regex = /^(?<package>[a-z0-9-]+)-(?<version>[0-9.]+)-(?<os>osx)-universal\.(?<type>dmg)$/
+      regex = /^(?<package>[a-z0-9-]+)-(?<version>[0-9.]+)-(?<os>osx)-(universal|intel)\.(?<type>dmg)$/
 
     when ".exe", ".msi"
       regex = /^(?<package>[a-z0-9-]+)-(?<version>[0-9.]+)-(?<os>windows)-(?<arch>x86|x86_64)\.(?<type>msi|exe)$/
