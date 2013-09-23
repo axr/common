@@ -23,12 +23,12 @@ parser.add_argument("--autofix", action="store_true", help="attempt to fix detec
 scriptDirectory = os.path.dirname(os.path.realpath(__file__))
 
 # Root directory of the Git repository
-repositoryDirectory = os.path.realpath(os.path.join(scriptDirectory, ".."))
+repositoryDirectory = os.path.realpath(os.getcwd())
 
 args = parser.parse_args()
 
 sourceHeader = ""
-with open(os.path.join(repositoryDirectory, "common", "header.txt")) as sourceHeaderFile:
+with open(os.path.join(scriptDirectory, "header.txt")) as sourceHeaderFile:
     sourceHeader = sourceHeaderFile.read()
 
 # File names and extensions to ignore
